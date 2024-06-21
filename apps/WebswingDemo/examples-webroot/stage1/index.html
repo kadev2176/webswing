@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html class="ws-fullscreen" lang="en">
+
+<head>
+    <title>Webswing Migration Stage 1</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' ws: wss: data:">
+    <meta charset="utf-8"/>
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css"/>
+    <link rel="icon" href="../favicon.ico"/>
+    <link rel="manifest" href="../manifest.json" />
+    <link rel="stylesheet" href="../style.css" />
+    <style>body{margin:0;}</style>
+</head>
+
+<body>
+<ws-layout pageTitle="Stage 1" pageIcon="1" pageDesc='Embeded app "AS-IS"'>
+    <div class="webswing-element" data-webswing-instance="webswingInstance0">
+        <div id="loading" class="ws-modal-container">
+            <div class="ws-login">
+                <div  class="ws-login-content"><div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div></div>
+            </div>
+        </div>
+    </div>
+</ws-layout>
+<div id="webswing-font-preload" style="position:fixed;color:transparent;" >
+    <span style="font-family: 'Roboto-Regular.ttf';">a</span>
+    <span style="font-family: 'RobotoMono-Regular.ttf';">a</span>
+    <span style="font-family: 'RobotoSlab-Regular.ttf';">a</span>
+</div>
+<script>
+    //fix for ie
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+
+    const getServerUrl = () => {
+        const href = window.location.href;
+        return href.substring(0, href.indexOf('/migration-examples')) + '/migration-examples';
+    }
+
+    var baseUrl = getServerUrl() + "/";
+
+    var webswingInstance0 = {
+        options: {
+            autoStart: true,
+            connectionUrl: baseUrl,
+            debugPort: getParam('debugPort'),
+            args: getParam('args'),
+            customization: function(injector){
+                // disable welcome back bar
+				injector.services.dialog.content.continueOldSessionDialog = null;
+
+                injector.services.base.handleActionEvent=function(actionName){
+                    if(actionName==='initialize'){
+                        webswingInstance0.performAction({actionName:"switchStage",data:"1"})
+                    }
+                }
+            }
+        }
+    }
+
+    function getParam(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(location.href);
+        return results == null ? null : decodeURIComponent(results[1]);
+    }
+</script>
+
+<script data-webswing-global-var="webswing">
+    (function (window, document) {
+        var loader = function () {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    var version = xmlhttp.status == 200 ? xmlhttp.responseText : "undefined";
+                    var script = document.createElement("script"),
+                        tag = document.getElementsByTagName("script")[0];
+                    script.src = baseUrl + "javascript/webswing-embed.js?version=" + version;
+                    tag.parentNode.insertBefore(script, tag);
+                }
+            };
+            xmlhttp.open("GET", baseUrl + "rest/version", true);
+            xmlhttp.send();
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+<script type="module" src="../webswing-webcomponents.umd.js"></script>
+</body>
+
+</html>

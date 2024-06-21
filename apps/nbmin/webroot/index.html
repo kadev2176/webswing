@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="ws-fullscreen" lang="en">
+
+<head>
+    <title>Webswing</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' ws: wss: data:">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/custom.css"/>
+    <link rel="icon" href="favicon.ico"/>
+    <link rel="manifest" href="manifest.json" />
+    
+    <style type="text/css">
+    	.webswing-html-canvas.modal-blocked {
+			filter: blur(2px);
+    	}
+    	
+    	.focusable:focus {
+    		background-color: yellow;
+    	}
+    </style>
+</head>
+
+<body style="position: relative;">
+	<div style="height: 100vh; width: 100%; display: flex;">
+		<div id="nav" style="display: flex; flex-direction: column; width: 30%; min-width: 100px; padding: 1rem; font-size: 16px; overflow: auto; border-right: 1px solid #AAAAAA;">
+			<img src="spinner.gif" style="align-self: center; justify-self: center;" width="100px" height="100px" />
+		</div>
+		<div id="container" style="height: 100%; flex-grow: 1; position: relative; display: flex; overflow: hidden;">
+			<div id="attach" style="flex-grow: 1; height: 100%;">
+			</div>
+			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" class="webswing-element" data-webswing-instance="webswingInstance0">
+			    <div id="loading" class="ws-modal-container">
+			        <div class="ws-login">
+			            <div  class="ws-login-content"><div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div></div>
+			        </div>
+			    </div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="hidden-container" style="display: none;">
+	</div>
+	
+<script>
+	//fix for ie
+	if (!window.location.origin) {
+	    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+	}
+	
+	var baseUrl = document.location.origin + document.location.pathname;
+	baseUrl = baseUrl.indexOf("/", baseUrl.length - 1) !== -1 ? baseUrl : (baseUrl + "/");
+
+    var webswingInstance0 = {
+        options: {
+            autoStart: true,
+            connectionUrl: baseUrl,
+            autoReconnect: 5000,
+            disableLogout: true,
+            syncClipboard: true,
+            args: getParam('args'),
+            recording: getParam('recording'),
+            binarySocket: getParam('binarySocket'),
+            debugPort: getParam('debugPort'),
+            recordingPlayback: getParam('recordingPlayback'),
+            securityToken: getParam('securityToken'),
+            realm: getParam('realm'),
+            debugLog: getParam('debugLog'),
+            pingParams:{count : 6, interval : 1, maxLatency : 1000, notifyIf : 3},
+            onStart: function() {
+				webswingInstance0.performAction({actionName: "requestFileList", data: null, binaryData: null})
+            },
+            customization: function(injector) {
+            	injector.services.base.handleActionEvent = function(actionName, data, binaryData) {
+    				if (actionName == 'fileList') {
+    					const nav = document.querySelector("#nav");
+    					nav.replaceChildren();
+    					if (data) {
+    						const files = data.split(";");
+    						for (let i=0; i<files.length; i++) {
+    							const file = document.createElement("div");
+    							file.textContent = files[i];
+    							file.style.cursor = "pointer";
+    							file.style.wordBreak = "break-all";
+    							file.addEventListener("click", (e) => {
+    								webswingInstance0.performAction({actionName: "fileSelected", data: files[i], binaryData: null})
+    							});
+	    						nav.appendChild(file);
+    						}
+    					}
+    				}
+      			}
+            },
+            compositingWindowsListener: {
+            	windowOpened: function(win) {
+            		console.log("window " + win.id + " (" + win.name + ") opened");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            		
+            		//if (win.name == "viewer-frame") {
+            		if (win.name != "NbMainWindow") {
+            			const winEl = win.detach();
+            			win.attach(document.querySelector("#container #attach"));
+            		} else {
+            			const winEl = win.detach();
+            			win.attach(document.querySelector("#hidden-container"));
+            		}
+            	},
+            	windowOpening: function(win) {
+            		console.log("window " + win.id + " opening");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            	},
+            	windowClosing: function(win, evt) {
+            		console.log("window " + win.id + " closing");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            		if (win.name == "internalIframe") {
+            			evt.preventDefault();
+            		}
+            		if (win.name == "test123") {
+            			evt.preventDefault();
+            		}
+            	},
+            	windowClosed: function(win) {
+            		console.log("window " + win.id + " closed");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            	},
+            	windowDocked: function(win) {
+            		console.log("window " + win.id + " docked");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            	},
+            	windowUndocked: function(win) {
+            		console.log("window " + win.id + " undocked");
+            		console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+            	}
+            }
+        }
+    }
+    
+    function focusWindow(winId) {
+    	var win = window.webswingInstance0.getWindowById(winId);
+    	if (!win) {
+    		return;
+    	}
+    	
+    	win.performAction({actionName: "focus"});
+    }
+    
+    function findHtmlIframeDocument(id) {
+    	return document.querySelector("iframe#" + id).contentDocument;
+    }
+
+    function getParam(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(location.href);
+        return results == null ? null : decodeURIComponent(results[1]);
+    }
+</script>
+
+<script data-webswing-global-var="webswing">
+    (function (window, document) {
+        var loader = function () {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    var version = xmlhttp.status == 200 ? xmlhttp.responseText : "undefined";
+                    var script = document.createElement("script"),
+                        tag = document.getElementsByTagName("script")[0];
+                    script.src = baseUrl + "javascript/webswing-embed.js?version=" + version;
+                    tag.parentNode.insertBefore(script, tag);
+                }
+            };
+            xmlhttp.open("GET", baseUrl + "rest/version", true);
+            xmlhttp.send();
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+</body>
+
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="ws-fullscreen" lang="en">
+
+<head>
+    <title>Webswing</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' ws: wss: data:">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/custom.css"/>
+    <link rel="stylesheet" href="css/highlight.css"/>
+    <link rel="icon" href="favicon.ico"/>
+    <link rel="manifest" href="manifest.json"/>
+
+    <script src="js/highlight.js"></script>
+    <script src="js/marked.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik|Poppins:300&display=swap" />
+
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/material.js"></script>
+
+    <style type="text/css">
+        webswing-htmlpanel.modal-blocked {
+            filter: blur(2px);
+        }
+
+        .focusable:focus {
+            background-color: yellow;
+        }
+
+        webswing-button::part(root),
+        webswing-togglebutton::part(root) {
+            font-size: 11px;
+            padding: 0;
+        }
+        
+        webswing-menuitem::part(root),
+        webswing-checkboxmenuitem::part(root),
+        webswing-radiobuttonmenuitem::part(root),
+        webswing-menu::part(root) {
+            font-size: 11px;
+        }
+
+        webswing-slider::part(root) {
+            margin: 0;
+        }
+
+        webswing-label::part(root) {
+            font-size: 11px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        webswing-passwordfield::part(root),
+        webswing-textfield::part(root) {
+            font-size: 11px;
+        }
+
+        webswing-tooltip::part(root) {
+            font-size: 11px;
+            border: 1px solid black;
+        }
+
+        webswing-popupmenu::part(root) {
+            border: 1px solid #AEAEAE;
+        }
+
+        webswing-checkbox::part(label),
+        webswing-radiobutton::part(label) {
+            font-size: 11px;
+            user-select: none;
+        }
+
+        webswing-radiobutton::part(radiobutton) {
+            margin: 3px 3px 3px 4px;
+        }
+
+        pre.code {
+            margin: 0;
+            width: max-content;
+        }
+
+        pre.code code {
+            background: white;
+        }
+
+        #selected-demo-readme h4 {
+            margin-block-start: 0;
+        }
+
+        #fcPanel {
+            display: flex;
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            max-width: 300px;
+            width: 100vw;
+            align-items: center;
+            justify-content: center;
+        }
+        #fcPanel.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="webswing-element" data-webswing-instance="webswingInstance0">
+    <div id="loading" class="ws-modal-container">
+        <div class="ws-login">
+            <div class="ws-login-content">
+                <div class="ws-spinner">
+                    <div class="ws-spinner-dot-1"></div>
+                    <div class="ws-spinner-dot-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fcPanel" class="hidden">
+    <span>Uploading...</span>
+    <progress id="fc-progress" value="0" max="100" style="margin-left: 10px;"></progress>
+    <br />
+    <div id="fc-errors" style="color: red;"></div>
+</div>
+
+<div id="webswing-font-preload" style="position:fixed;color:transparent;">
+    <span style="font-family: 'Roboto-Regular.ttf';">a</span>
+    <span style="font-family: 'RobotoMono-Regular.ttf';">a</span>
+    <span style="font-family: 'RobotoSlab-Regular.ttf';">a</span>
+</div>
+
+<template id="template-readme">
+    <div id="selected-demo-readme" style="padding: 1rem;"></div>
+</template>
+<template id="template-source">
+    <pre class="code"><code id="selected-demo-source"></code></pre>
+</template>
+
+
+<script src="elements/ws-personal-form.js"></script>
+<script src="elements/ws-animation-panel.js"></script>
+<script src="elements/ws-chart.js"></script>
+<script src="elements/webswing-button.js"></script>
+<script src="elements/webswing-label.js"></script>
+<script src="elements/webswing-panel.js"></script>
+<script src="elements/webswing-textfield.js"></script>
+<script src="elements/webswing-combobox.js"></script>
+<script src="elements/webswing-checkbox.js"></script>
+<script src="elements/webswing-passwordfield.js"></script>
+<script src="elements/webswing-radiobutton.js"></script>
+<script src="elements/webswing-progressbar.js"></script>
+<script src="elements/webswing-togglebutton.js"></script>
+<script src="elements/webswing-separator.js"></script>
+<script src="elements/webswing-popupmenuseparator.js"></script>
+<script src="elements/webswing-toolbarseparator.js"></script>
+<script src="elements/webswing-tooltip.js"></script>
+<script src="elements/webswing-textarea.js"></script>
+<script src="elements/webswing-slider.js"></script>
+<script src="elements/webswing-popupmenu.js"></script>
+<script src="elements/webswing-menuitem.js"></script>
+<script src="elements/webswing-menu.js"></script>
+<script src="elements/webswing-menubar.js"></script>
+<script src="elements/webswing-spinner.js"></script>
+<script src="elements/webswing-formattedtextfield.js"></script>
+<script src="elements/webswing-radiobuttonmenuitem.js"></script>
+<script src="elements/webswing-checkboxmenuitem.js"></script>
+
+<script>
+    //fix for ie
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+
+    var baseUrl = document.location.origin + document.location.pathname;
+    baseUrl = baseUrl.indexOf("/", baseUrl.length - 1) !== -1 ? baseUrl : (baseUrl + "/");
+
+    var webswingInstance0 = {
+        options: {
+            autoStart: true,
+            connectionUrl: baseUrl,
+            autoReconnect: 5000,
+            disableLogout: true,
+            syncClipboard: true,
+            args: getParam('args'),
+            recording: getParam('recording'),
+            binarySocket: getParam('binarySocket'),
+            debugPort: getParam('debugPort'),
+            recordingPlayback: getParam('recordingPlayback'),
+            securityToken: getParam('securityToken'),
+            realm: getParam('realm'),
+            debugLog: getParam('debugLog'),
+            pingParams:{count : 6, interval : 1, maxLatency : 1000, notifyIf : 3},
+            customization: function(injector) {
+                var taskbar = injector.services.taskbar;
+                taskbar.config.enabled = true;
+                taskbar.config.autoHide = true;
+                //injector.services.canvas.canvasConfig.disposeOnDisconnect = false;
+
+                injector.services.files.manager.getAcceptFilter = function(fileChooserName, filter) {
+                    if (fileChooserName === 'uploadFC') {
+                        return "image/png";
+                    }
+                    return filter;
+                };
+
+                injector.services.files.manager.validateUploadedFile = function(fileChooserName, file) {
+                    if (fileChooserName === 'uploadFC') {
+                        if (file.name.endsWith(".png") || file.type === 'image/png') {
+                            return { valid: true };
+                        }
+                        return { valid: false, error: "Cannot upload file - " + file.name };
+                    }
+                    return { valid: true };
+                };
+
+                injector.services.base.handleActionEvent = function(actionName, data, binaryData) {
+                    if (actionName == "ApiDemoActionEventTest") {
+                        console.log("sendActionEvent - " + data);
+                        alert("sendActionEvent - " + data);
+                    }
+                }
+            },
+            compositingWindowsListener: {
+                windowOpened: function(win) {
+                    console.log("window " + win.id + " opened");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                    if (getParam('loadtest') === 'true') {
+                        location.reload();
+                    }
+
+                    if (win.htmlWindow && win.name == "apiDemoHtmlPanelTest") {
+                        if (win.element.getAttribute("ws-initialized") == "true") {
+                            return;
+                        }
+                        win.element.setAttribute("ws-initialized", "true");
+
+                        let apiDemoButton = document.createElement("button");
+                        apiDemoButton.appendChild(document.createTextNode("This is HTML button. Click me!"));
+                        apiDemoButton.style.margin = "25px";
+                        apiDemoButton.addEventListener("click", function() {
+                            win.performAction({actionName: "openApiDemoConfirmDialog"});
+                        });
+
+                        let apiDemoResult = document.createElement("div");
+                        apiDemoResult.style.margin = "25px";
+                        win.element.appendChild(apiDemoButton);
+                        win.element.appendChild(apiDemoResult);
+
+                        win.handleActionEvent = function(name, data, binaryData) {
+                            if (name == "confirmApiDemoDialogResult") {
+                                apiDemoResult.innerHTML = 'You have selected: "' + data + '"';
+                            } else if (name == "sendActionEvent") {
+                                console.log('Your input text: "' + data + '"');
+                                apiDemoResult.innerHTML = 'Your input text: "' + data + '"';
+                            }
+                        }
+                    } else if (win.htmlWindow && win.name == "test123") {
+                        if (win.element.getAttribute("ws-initialized") == "true") {
+                            return;
+                        }
+                        win.element.setAttribute("ws-initialized", "true");
+
+                        var button = document.createElement("button");
+                        var btnValue = document.createTextNode("This is HTML button. Click me!");
+                        button.appendChild(btnValue);
+                        button.style.margin = "10px";
+                        button.classList.add("focusable");
+                        button.addEventListener("click", function() {
+                            win.performAction({actionName: "openConfirmDialog"});
+                        });
+
+                        var input = document.createElement("input");
+                        input.value = "this is a text";
+                        input.style.margin = "10px";
+                        input.classList.add("focusable");
+
+                        var button2 = document.createElement("button");
+                        var btnValue2 = document.createTextNode("This is another button. Click me!");
+                        button2.appendChild(btnValue2);
+                        button2.style.margin = "10px";
+                        button2.classList.add("focusable");
+                        /* button2.addEventListener("click", function() {
+                            win.performAction({actionName: "openConfirmDialog"});
+                        }); */
+
+                        var name = document.createElement("span");
+                        name.textContent = "test123";
+                        name.style.margin = "10px";
+
+                        win.element.appendChild(name);
+                        win.element.appendChild(button);
+                        win.element.appendChild(input);
+                        win.element.appendChild(button2);
+
+                        win.element.style.background = "white";
+                        win.element.style.textAlign = "center";
+                        win.element.style.overflow = "hidden";
+
+                        win.handleActionEvent = function(name, data, binaryData) {
+                            if (name == "confirmDialogResult") {
+                                var resE = win.element.querySelector("#confirmDialogResult");
+                                if (resE && resE.parentNode) {
+                                    resE.parentNode.removeChild(resE);
+                                }
+
+                                resE = document.createElement("div");
+                                resE.id = "confirmDialogResult";
+                                resE.appendChild(document.createTextNode('You have selected: "' + data + '"'));
+                                win.element.appendChild(resE);
+                            }
+                        }
+                    } else if (win.htmlWindow && win.name == "test456") {
+                        var input = document.createElement("input");
+                        input.value = "another text";
+                        input.style.margin = "10px";
+                        input.classList.add("focusable");
+
+                        var name = document.createElement("span");
+                        name.textContent = "test456";
+                        name.style.margin = "10px";
+
+                        win.element.appendChild(name);
+                        //win.element.appendChild(input);
+
+                        win.element.style.background = "white";
+                        win.element.style.textAlign = "center";
+                        win.element.style.overflow = "hidden";
+                        win.element.style.border = "1px dotted black";
+                    } else if (win.htmlWindow && win.name == "testIframe") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "iframe.html";
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "white";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "internalIframe_1") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "iframe_internal_1.html";
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        iframe.setAttribute("data-id", win.id);
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "#00FF0099";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "internalIframe_2") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "iframe_internal_2.html";
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        iframe.setAttribute("data-id", win.id);
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "#FF000099";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "window-internalIframe") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "iframe_internal.html";
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        iframe.setAttribute("data-id", win.id);
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "white";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "fc-panel") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "file_chooser.html";
+                        iframe.id = 'fc-panel';
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        iframe.style.border = "0";
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "white";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "fe-panel") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = baseUrl + "file_explorer.html";
+                        iframe.id = 'fe-panel';
+                        iframe.width = "100%";
+                        iframe.height = "100%";
+                        iframe.style.border = "0";
+                        win.element.appendChild(iframe);
+                        win.element.style.background = "white";
+                        win.element.style.overflow = "hidden";
+                    } else if (win.htmlWindow && win.name == "selected-demo-readme") {
+                        win.element.appendChild(document.querySelector('#template-readme').content.cloneNode(true));
+                        win.handleActionEvent = function(name, data, binaryData) {
+                            if (name == "setCurrentDemoReadme") {
+                                document.querySelector('#selected-demo-readme').innerHTML = marked.parse(data);
+                            }
+                        }
+                        win.element.style.overflow = 'auto';
+                        win.element.style.outline = 'none';
+                    } else if (win.htmlWindow && win.name == "selected-demo-source") {
+                        win.element.appendChild(document.querySelector('#template-source').content.cloneNode(true));
+                        win.handleActionEvent = function(name, data, binaryData) {
+                            if (name == "setCurrentDemoSource") {
+                                document.querySelector('#selected-demo-source').textContent = data;
+                                hljs.highlightAll();
+                            }
+                        }
+                        win.element.style.background = 'white';
+                        win.element.style.overflow = 'auto';
+                        win.element.style.outline = 'none';
+                    }
+                },
+                windowOpening: function(win) {
+                    console.log("window " + win.id + " opening");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                },
+                windowClosing: function(win, evt) {
+                    console.log("window " + win.id + " closing");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                    if (win.name == "internalIframe") {
+                        evt.preventDefault();
+                    }
+                    if (win.name == "test123") {
+                        evt.preventDefault();
+                    }
+                },
+                windowClosed: function(win) {
+                    console.log("window " + win.id + " closed");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                },
+                windowDocked: function(win) {
+                    console.log("window " + win.id + " docked");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                },
+                windowUndocked: function(win) {
+                    console.log("window " + win.id + " undocked");
+                    console.log("Rendering " + window.webswingInstance0.getRenderedWindows().length + " windows");
+                }
+            },
+            filesListener: {
+                directTransferDownloadProgressAll: (downloadsCount, loadedAll, totalAll) => {
+                    var progress = findFileIframe().querySelector("#fc-progress");
+                    progress.style.display = 'block';
+                    progress.value = loadedAll;
+                    progress.max = totalAll;
+                },
+                directTransferDownloadAllDone: () => {
+                    var progress = findFileIframe().querySelector("#fc-progress");
+                    progress.value = 0;
+                    progress.style.display = 'none';
+                },
+                directTransferDownloadFailed: (reason) => {
+                    var errorDiv = findFileIframe().querySelector("#fc-errors");
+                    errorDiv.insertAdjacentHTML('beforeend', "<div>" + reason + "</div>");
+                },
+                fileUploadProgressAll: (loadedAll, totalAll) => {
+                    var progress = findFileIframe().querySelector("#fc-progress");
+                    progress.style.display = 'block';
+                    progress.value = loadedAll;
+                    progress.max = totalAll;
+                },
+                fileUploadDone: (fileName) => {
+                    var progress = findFileIframe().querySelector("#fc-progress");
+                    progress.value = 0;
+                    progress.style.display = 'none';
+                    
+                    webswingInstance0.getFilesManager().filesSelected([fileName]);
+
+                    const externalPanel = document.querySelector("#fcPanel");
+                    externalPanel.classList.add('hidden');
+                },
+                fileUploadFailed: (isAbort, fileNames, responseText) => {
+                    var errorDiv = findFileIframe().querySelector("#fc-errors");
+                    errorDiv.insertAdjacentHTML('beforeend', "<div>" + (responseText || "") + "</div>");
+                },
+                handleError: (msg) => {
+                    var errorDiv = findFileIframe().querySelector("#fc-errors");
+                    errorDiv.insertAdjacentHTML('beforeend', "<div>" + (msg || "") + "</div>");
+                }
+            }
+        }
+    }
+
+    function findFileIframe() {
+        const externalPanel = document.querySelector("#fcPanel");
+        let panel = findHtmlIframeDocument("fc-panel") || findHtmlIframeDocument("fe-panel");
+        if (panel != null) {
+            externalPanel.classList.add('hidden');
+            return panel;
+        }
+        externalPanel.classList.remove('hidden');
+        return externalPanel;
+    }
+
+    function focusWindow(winId) {
+        var win = window.webswingInstance0.getWindowById(winId);
+        if (!win) {
+            return;
+        }
+
+        win.performAction({actionName: "focus"});
+    }
+
+    function findHtmlIframeDocument(id) {
+        const ifr = document.querySelector("iframe#" + id);
+        return ifr ? ifr.contentDocument : null;
+    }
+
+    function getParam(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(location.href);
+        return results == null ? null : decodeURIComponent(results[1]);
+    }
+</script>
+
+<script data-webswing-global-var="webswing">
+    (function (window, document) {
+        var loader = function () {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    var version = xmlhttp.status == 200 ? xmlhttp.responseText : "undefined";
+                    var script = document.createElement("script"),
+                        tag = document.getElementsByTagName("script")[0];
+                    script.src = baseUrl + "javascript/webswing-embed.js?version=" + version;
+                    tag.parentNode.insertBefore(script, tag);
+                }
+            };
+            xmlhttp.open("GET", baseUrl + "rest/version", true);
+            xmlhttp.send();
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+</body>
+
+</html>

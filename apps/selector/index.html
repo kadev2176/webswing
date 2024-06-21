@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html class="ws-fullscreen" lang="en">
+<head>
+    <title>Webswing</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="icon" href="favicon.ico"/>
+    <style type="text/css">
+		#main {
+			display: flex;
+			flex-direction: column;
+			padding: 1rem;
+			width: 100vw;
+			height: 100vh;
+			overflow-y: auto;
+			box-sizing: border-box;
+		}
+
+    	.ws-selector-modal {
+			overflow-y: hidden;
+		}
+		
+		#feedbackDiv {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			align-items: center;
+			cursor: pointer;
+			transition: all 1s ease-out;
+			max-height: 200px;
+		}
+
+		#feedbackDiv.hidden {
+			max-height: 0;
+		}
+        
+        #feedbackDiv #feedbackTitle {
+			margin: 1rem 0;
+		}
+
+        #feedbackDiv .feedbackRating {
+          display: flex;
+          gap: 2rem;
+          flex-direction: row;
+          justify-content: center;
+          width: 100%;
+		}
+
+        #feedbackDiv .feedbackRating .box {
+            flex: 0.25;
+            width: 20%;
+            max-width: 50px;
+            box-sizing: border-box;
+        }
+  
+        #feedbackDiv .feedbackRating .icon {
+            height: auto;
+			max-width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: auto;
+        }
+  
+        #feedbackDiv .feedbackRating .name {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            font-size: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main">
+	<div class="webswing-element" data-webswingselectorinstance="wsSelector">
+		<div class="webswing-element-content">
+			<div class="ws-modal-container">
+				<div id="commonDialog" class="ws-modal ws-selector-modal" role="dialog" aria-labelledby="commonDialog-title" aria-describedby="commonDialog-description">
+					<div class="ws-selector-top">
+						<div id="webswing-header" class="ws-selector-header"></div>
+						<div class="ws-selector-grow"></div>
+						<div id="webswing-links" class="ws-selector-admin"></div>
+					</div>
+					<div id="webswing-content" class="ws-selector-content"><div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div></div>
+					<div class="ws-selector-bottom">
+						<div id="feedbackDiv" class="hidden" onclick="openFeedback()">
+							<div id="feedbackTitle"></div>
+							<div class="feedbackRating">
+								<div class="box">
+									<img class="icon" src="images/happy.png" alt="Awesome app" />
+								</div>
+								<div class="box">
+									<img class="icon" src="images/thinking.png" alt="Nice witchcraft, I'll investigate more" />
+								</div>
+								<div class="box">
+									<img class="icon" src="images/sad.png" alt="Doesn't work for my app" />
+								</div>
+								<div class="box">
+									<img class="icon" src="images/disappointed.png" alt="Not suitable for my use case" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	window.wsSelector = {
+		showAdmin: false,
+		adminConsoleUrl: null,
+		options: {
+			createSelectorPageContent: function(apps, showAdmin, adminConsoleUrl) {
+				this.showAdmin = showAdmin;
+				this.adminConsoleUrl = adminConsoleUrl;
+				return false;
+			},
+			feedbackUrlLoaded: function(feedbackUrl) {
+				if (feedbackUrl == null || feedbackUrl.length == 0) {
+					return;
+				}
+				const feedbackTitle = document.querySelector("#feedbackTitle");
+				feedbackTitle.textContent = translate("feedback.title", "We'd love to get some feedback!");
+				const feedbackDiv = document.querySelector("#feedbackDiv");
+				feedbackDiv.classList.remove('hidden');
+				feedbackDiv.addEventListener("click", function() {
+					window.open(feedbackUrl, "_blank");
+				});
+			},
+			afterAppsCreated: function() {
+				if (this.showAdmin && this.adminConsoleUrl != null) {
+					const container = document.querySelector(".ws-selector-container");
+					const qsUrl = this.adminConsoleUrl + (this.adminConsoleUrl.endsWith('/') ? "" : "/") + "quickstart";
+					const qsApp = '<div class="ws-selector-btn"><a href="' + qsUrl + '" role="button" aria-labelledby="selector-btn-' + 0 + '">'
+                		+ '<div class="ws-selector-btn-wrapper">'
+						+ '<img src="' + "images/lightning.png" + '" class="ws-selector-btn-thumb"/>'
+						+ '</div>'
+						+ '<div id="selector-btn-' + 0 + '" class="ws-selector-btn-label">' + translate("quickstart.title", "Quickstart") + '</div>'
+						+ '</a></div>';
+						container.insertAdjacentHTML("afterbegin", qsApp);
+				}
+			}
+		}
+	}
+
+	function translate(key, defaultString) {
+		let translated = defaultString;
+		if (wsSelector.options.translate) {
+			translated = wsSelector.options.translate(key);
+			if (!translated) {
+				translated = defaultString;
+			}
+		}
+		return translated;
+	}
+</script>
+<script src="javascript/webswing-selector.js"></script>
+
+</body>
+</html>

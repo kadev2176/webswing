@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demo text file viewer</title>
+		<meta charset="utf-8">
+		<script language="javascript" type="text/javascript">
+			const searchParams = new URLSearchParams(window.location.search);
+			const blobId = searchParams.get('file');
+			console.log("blobId", blobId)
+		
+			document.addEventListener("DOMContentLoaded", function(event) {
+				var fileContent = document.getElementById('filecontent');
+				fileContent.value = 'Loading file content ...';
+				
+				fetch(blobId)
+				  .then(response => response.blob())
+				  .then(blob => {
+				    const reader = new FileReader();
+				    reader.readAsText(blob);
+				    reader.onloadend = function() {
+				      fileContent.value = reader.result;
+				    };
+				  })
+				  .catch(error => {
+					  fileContent.value = "Blob error " + error
+					  console.error('blob error', error)
+				  });
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Text file viewer</h1>
+		<textarea id="filecontent" rows="20" cols="110" style="white-space: pre" readonly></textarea>
+	</body>
+</html>
